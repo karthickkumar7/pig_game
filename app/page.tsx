@@ -8,14 +8,14 @@ import {
     PiDiceFiveBold,
     PiDiceSixBold,
 } from 'react-icons/pi';
-import dynamic from 'next/dynamic';
-import Image from 'next/image';
 import Alert from '@/components/alert';
+import Header from '@/components/header';
 
 type Dice = 1 | 2 | 3 | 4 | 5 | 6;
 
 const Home = () => {
     const [isPlayerOneTurn, setIsPlayerOneTurn] = useState(true);
+    const [dark, setDark] = useState(true);
     const [dice, setDice] = useState<Dice>(6);
     const [p1, setP1] = useState({
         name: 'player 1',
@@ -28,7 +28,7 @@ const Home = () => {
         total: 0,
     });
     const [matchRules, setMatchRules] = useState({
-        scoreCap: 20,
+        scoreCap: 12,
         targetScore: 50,
     });
     const [gameOver, setGameOver] = useState({
@@ -36,8 +36,7 @@ const Home = () => {
         msg: '',
     });
 
-    const diceStyle = 'text-6xl text-white';
-    const Settings = dynamic(() => import('@/components/popup'));
+    const diceStyle = `text-6xl ${dark ? 'text-white' : 'text-black'}`;
 
     const diceMap = {
         1: <PiDiceOneBold className={diceStyle} />,
@@ -100,7 +99,11 @@ const Home = () => {
     }, [p1.total, p2.total]);
 
     return (
-        <div className="relative w-screen h-screen flex flex-col items-center justify-center bg-slate-900">
+        <div
+            className={`relative w-screen h-screen flex flex-col items-center ${
+                dark ? 'bg-slate-900 text-white' : 'bg-white text-black'
+            }`}
+        >
             {gameOver.state && (
                 <Alert
                     msg={gameOver.msg}
@@ -110,70 +113,122 @@ const Home = () => {
                 />
             )}
 
-            <div className="absolute top-2 left-2 flex items-center">
-                <Image src="/pig_logo.png" alt="logo" width={80} height={80} />
-                <span className="absolute left-16 text-white">GAME</span>
-            </div>
-            <Settings
-                scoreCap={matchRules.scoreCap}
-                targetScore={matchRules.targetScore}
+            {/* HEADER */}
+            <Header
                 setMatchRules={setMatchRules}
+                dark={dark}
+                setDark={setDark}
             />
-            <section
-                className={`w-2/3 lg:w-[500px] h-[300px] p-4 text-2xl font-semibold rounded-lg flex flex-col items-center justify-center space-y-4 capitalize text-white bg-slate-800 ${
-                    isPlayerOneTurn && 'shadow-2xl ring ring-teal-200'
-                }`}
-            >
-                <h4 className="text-4xl tracking-wide">{p1.name}</h4>
-                <p>
-                    score -{' '}
-                    <span
-                        className={`${
-                            isPlayerOneTurn && 'text-3xl text-teal-200'
-                        }`}
-                    >
-                        {p1.score}
-                    </span>
-                </p>
-                <p className="">total - {p1.total}</p>
-            </section>
-            <br />
 
-            <section className="flex items-center space-x-4">
-                <button
-                    className="p-4 ring-2 text-lg font-semibold uppercase shadow focus:outline-none bg-white active:bg-slate-200"
-                    onClick={rollDice}
-                >
-                    roll
-                </button>
-                <div className="">{diceMap[dice]}</div>
-                <button
-                    className="p-4 ring-2 text-lg font-semibold uppercase shadow focus:outline-none bg-white active:bg-slate-200"
-                    onClick={holdScore}
-                >
-                    hold
-                </button>
-            </section>
-
-            <br />
-            <section
-                className={`w-2/3 lg:w-[500px] h-[300px] p-4 text-2xl font-semibold rounded-lg flex flex-col items-center justify-center space-y-4 capitalize text-white bg-slate-800 ${
-                    !isPlayerOneTurn && 'shadow-2xl ring ring-teal-200'
-                }`}
+            {/* GAME */}
+            <div
+                className={`max-w-[1200px] h-[calc(100vh-150px-60px)] mx-auto flex flex-col justify-center space-y-6`}
             >
-                <h4 className="text-4xl">{p2.name}</h4>
-                <p>
-                    score -{' '}
-                    <span
-                        className={`${
-                            !isPlayerOneTurn && 'text-3xl text-teal-200'
+                {/* PLAYER 1 */}
+                <section
+                    className={`w-[300px] lg:w-[500px] h-[250px] lg:h-[300px] text-xl lg:text-2xl font-semibold ring ${
+                        isPlayerOneTurn
+                            ? 'ring-green-400'
+                            : `${dark ? 'ring-white' : 'ring-black'}`
+                    }`}
+                >
+                    <div className="w-full h-[180px] lg:h-[200px] flex items-center justify-center space-x-2">
+                        <p>current score</p>
+                        <div
+                            className={`p-8 text-2xl ${
+                                dark ? 'bg-slate-700' : 'bg-slate-100'
+                            }`}
+                        >
+                            <span
+                                className={`${
+                                    isPlayerOneTurn
+                                        ? 'text-3xl text-green-400'
+                                        : `${
+                                              dark ? 'text-white' : 'text-black'
+                                          }`
+                                }`}
+                            >
+                                {p1.score}
+                            </span>
+                        </div>
+                    </div>
+                    <div className="flex justify-center space-x-4">
+                        <p>player 1</p>
+                        <p>total : {p1.total}</p>
+                    </div>
+                </section>
+
+                {/* MIDDLE */}
+                <section className="flex items-center space-x-4 mx-auto">
+                    <button
+                        className={`p-4 ring-2 text-lg font-semibold uppercase shadow focus:outline-none ${
+                            dark
+                                ? 'bg-white text-black active:bg-slate-200'
+                                : 'bg-black text-white active:bg-slate-800'
                         }`}
+                        onClick={rollDice}
                     >
-                        {p2.score}
-                    </span>
-                </p>
-                <p>total - {p2.total}</p>
-            </section>
+                        roll
+                    </button>
+                    <div className="">{diceMap[dice]}</div>
+                    <button
+                        className={`p-4 ring-2 text-lg font-semibold uppercase shadow focus:outline-none ${
+                            dark
+                                ? 'bg-white text-black active:bg-slate-200'
+                                : 'bg-black text-white active:bg-slate-800'
+                        }`}
+                        onClick={holdScore}
+                    >
+                        hold
+                    </button>
+                </section>
+
+                {/* PLAYER 2 */}
+                <section
+                    className={`w-[300px] lg:w-[500px] h-[250px] lg:h-[300px] text-xl lg:text-2xl font-semibold ring ${
+                        !isPlayerOneTurn
+                            ? 'ring-green-400'
+                            : `${dark ? 'ring-white' : 'ring-black'}`
+                    }`}
+                >
+                    <div className="w-full h-[180px] lg:h-[200px] flex items-center justify-center space-x-2">
+                        <p>current score</p>
+                        <div
+                            className={`p-8 text-2xl ${
+                                dark ? 'bg-slate-700' : 'bg-slate-100'
+                            }`}
+                        >
+                            <span
+                                className={`${
+                                    !isPlayerOneTurn
+                                        ? 'text-3xl text-green-400'
+                                        : `${
+                                              dark ? 'text-white' : 'text-black'
+                                          }`
+                                }`}
+                            >
+                                {p2.score}
+                            </span>
+                        </div>
+                    </div>
+                    <div className="flex justify-center space-x-4">
+                        <p>player 2</p>
+                        <p>total : {p2.total}</p>
+                    </div>
+                </section>
+            </div>
+
+            {/* INFO */}
+            <div className="w-full h-[150px]">
+                <div
+                    className={`max-w-[1200px] h-full mx-auto flex flex-col justify-center items-center text-3xl ${
+                        dark ? 'text-white' : 'text-black'
+                    }`}
+                >
+                    <p>score : {matchRules.scoreCap}</p>
+                    <p>target : {matchRules.targetScore}</p>
+                </div>
+            </div>
         </div>
     );
 };
