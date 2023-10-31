@@ -110,6 +110,7 @@ const Home = () => {
                     setP1={setP1}
                     setP2={setP2}
                     setGameOver={setGameOver}
+                    dark={dark}
                 />
             )}
 
